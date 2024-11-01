@@ -1,18 +1,18 @@
 <template>
     <v-card class="mx-auto" max-width="400" style="margin: 10px;box-shadow: inset;">
       <v-img class="align-end text-white" height="200" width="400" :src="randomImage" cover>
-        <v-card-title >{{ props.course.name }}</v-card-title>
+        <!-- <v-card-title >{{ props.course.name }}</v-card-title> -->
       </v-img>
   
-      <v-card-subtitle class="pt-4"> {{ props.course.id }} </v-card-subtitle>
+      <v-card-subtitle class="pt-4"  style="color: black;font-weight: bolder;"> {{ props.course.name}} </v-card-subtitle>
   
       <v-card-text>
         <div>The course is taught by Teacher: {{ getTeacherName(props.course.teacherID)}}</div>
       </v-card-text>
   
       <v-card-actions >
-        <v-btn background-color="red" color="red" @click="deleteCourse" >Delete</v-btn>
-        <v-btn @click="openUpdateDialog" color="rgb(30, 144, 255)">Update</v-btn>
+        <v-btn @click.stop="deleteCourse" style="background-color: red; color: white;" >Delete</v-btn>
+        <v-btn @click.stop="openUpdateDialog" style="background-color: rgb(30, 144, 255);color: white;">Update</v-btn>
         <UpdateDialog 
                         @close-dialog="handleCloseEvent" 
                         @update-table="props.fetchData"
@@ -78,7 +78,6 @@ const getRandomImage = () => {
     console.error('There was an error fetching the random image:', error);
   }
 };
-
   
   onMounted(() => {
     getTeacherName(props.course.teacherID);

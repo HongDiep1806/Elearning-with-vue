@@ -22,38 +22,62 @@
                     <v-list>
                         <v-list-item v-for="(item, index) in items" :key="index" @click="item.action">
                             <v-list-item-content>
-                                <v-list-item-title style="color:rgb(16, 102, 152) ; font-weight: bolder;">{{ item.title}}</v-list-item-title>
+                                <v-list-item-title style="color:rgb(16, 102, 152) ; font-weight: bolder;">{{
+                                    item.title }}</v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list>
                 </v-navigation-drawer>
 
-                <v-main style="margin-top: 10px">
+                <v-main style="margin-top: 10px;height: 100%;">
                     <v-container style="display: flex; justify-content: flex-end;align-items: flex-start;">
                         <v-btn icon="mdi-plus" size="small"
                             style="background-color: rgb(30, 144, 255); color: aliceblue;"
-                            @click="navigateToCreateCourse"></v-btn>
+                        ></v-btn>
                     </v-container>
-                    <div class="course-grid">
-                        <CourseCard v-for="course in courses" :key="course.id" :course="course" :teachers="teachers"
-                            :fetchData="fetchData" @click.stop="navigateToCourseDetail(course.id)"></CourseCard>
-                    </div>
+                    <v-table>
+                        <thead style="background-color: rgb(16, 102, 152); color: white;">
+                            <tr>
+                                <th class="text-left">
+                                    IRN
+                                </th>
+                                <th class="text-left">
+                                    Name
+                                </th>
+                                <th class="text-left">
+                                    Date Of Birth
+                                </th>
+                                <th class="text-left">
+                                    Address
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in students" :key="item.id">
+                                <td>{{ item.IRN }}</td>
+                                <td>{{ item.Name }}</td>
+                                <td>{{ item.DOB }}</td>
+                                <td>{{ item.Address }}</td>
+
+                            </tr>
+                        </tbody>
+                    </v-table>
                 </v-main>
             </v-layout>
         </v-card>
     </v-container>
+
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import type { Student } from '@/types/Student';
+import axios from 'axios';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CourseCard from './CourseCard.vue';
 import type { Course } from '../types/Course.ts';
-import axios from 'axios';
-import { onMounted } from 'vue';
 import type { Teacher } from '@/types/Teacher';
-import CourseDetail from './CourseDetail.vue';
-
 
 const router = useRouter();
 
@@ -65,65 +89,27 @@ const navigateToCourselist = () => {
     router.push({ name: 'courselist' });
 };
 
-const navigateToCreateCourse = () => {
-    // Create a comma-separated string of teacher IDs
-    router.push({
-        name: 'createCourse',
-    });
-};
 const navigateToStudentlist = () => {
-  router.push({ name: 'studentlist' });
+    router.push({ name: 'studentlist' });
 };
-const navigateToCourseDetail = (currentCourseID: string) => {
-    router.push({ name: 'courseDetail', params: { courseID: currentCourseID } });
-}
-
 
 
 const drawer = ref(false);
 const items = ref([
     { title: 'Home', action: navigateToHomePage },
     { title: 'Course List', action: navigateToCourselist },
-    {title : 'Students' , action : navigateToStudentlist}
+    { title: 'Students', action: navigateToStudentlist }
 
 ]);
 
-const courses = ref<Course[]>([]);
-const fetchData = async () => {
-    try {
-        const response = await axios.get('https://localhost:7117/api/Course');
-        courses.value = response.data;
-    } catch (error) {
-        console.error("There was an error fetching the data:", error);
-    }
+const students = ref<Student[]>([])
+const getStudents = async () => {
+    const response = await axios.get('https://localhost:7117/api/Student')
+    students.value = response.data
 }
-const teachers = ref<Teacher[]>([]);
-const getTeacherList = async () => {
-    try {
-        const response = await axios.get<Teacher[]>('https://localhost:7117/api/Teacher');
-        teachers.value = response.data;
-    } catch (error) {
-        console.error("There was an error fetching the data:", error);
-    }
-}
-
 onMounted(async () => {
-    await fetchData();
-    await getTeacherList();
+    await getStudents()
 })
+
+
 </script>
-
-<style scoped>
-.course-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    /* Adjust the gap between cards as needed */
-}
-
-.course-grid>* {
-    flex: 1 1 calc(50% - 16px);
-    /* Adjust the width and gap between cards */
-    box-sizing: border-box;
-}
-</style>
